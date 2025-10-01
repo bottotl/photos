@@ -133,8 +133,9 @@ private var gridColumns: [GridItem] {
 
 ## Important Notes
 
-- **iOS Target**: 18.0+ (uses iOS 18 APIs like `.onGeometryChange`)
-- **Xcode Version**: 16.0+ required
-- **Swift Version**: 5.10+ for @Observable macro support
+- **iOS Target**: 26.0+ (uses iOS 26 Liquid Glass design system)
+- **Xcode Version**: 17.0+ required
+- **Swift Version**: 6.0+ for latest language features
+- **Design System**: iOS 26 Liquid Glass (dynamic materials and lensing)
 - **No Storyboards**: Pure SwiftUI project, no UIKit/Storyboard files
 - **No CocoaPods/SPM**: Currently no external dependencies
