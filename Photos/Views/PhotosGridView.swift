@@ -21,6 +21,7 @@ struct PhotosGridView: View {
                 }
             }
         }
+        .defaultScrollAnchor(.bottom)
         .ignoresSafeArea(edges: .top)
     }
 
