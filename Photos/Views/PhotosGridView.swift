@@ -24,6 +24,7 @@ struct PhotosGridView: View {
                 }
             }
         }
+        .defaultScrollAnchor(.bottom)
         .ignoresSafeArea(edges: .top)
         .navigationTitle("图库")
         .toolbar {
