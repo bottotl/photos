@@ -9,20 +9,33 @@ import SwiftUI
 struct PhotosGridView: View {
     @Environment(ModelData.self) private var modelData
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var scrollPosition: UUID?
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVGrid(
-                columns: gridColumns,
-                spacing: Constants.photoGridSpacing
-            ) {
-                ForEach(modelData.sortedMediaItems) { item in
-                    photoItemButton(for: item)
+        ZStack(alignment: .bottom) {
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(
+                    columns: gridColumns,
+                    spacing: Constants.photoGridSpacing
+                ) {
+                    ForEach(modelData.sortedMediaItems) { item in
+                        photoItemButton(for: item)
+                    }
                 }
             }
+            .scrollPosition(id: $scrollPosition)
+            .defaultScrollAnchor(.bottom)
+            .ignoresSafeArea(edges: .top)
+            .onChange(of: scrollPosition) { _, newValue in
+                checkScrollPosition(newValue)
+            }
+
+            // 时间筛选器 - 不在底部时显示
+            if !modelData.isAtBottom {
+                TimelineFilterView()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
-        .defaultScrollAnchor(.bottom)
-        .ignoresSafeArea(edges: .top)
     }
 
     // MARK: - 照片项按钮
@@ -70,6 +83,23 @@ struct PhotosGridView: View {
                 modelData.selectedItems.remove(item.id)
             } else {
                 modelData.selectedItems.insert(item.id)
+            }
+        }
+    }
+
+    // 检测滚动位置
+    private func checkScrollPosition(_ position: UUID?) {
+        guard let position = position,
+              let lastItem = modelData.sortedMediaItems.last else {
+            return
+        }
+
+        // 检查是否在底部（最后一项可见）
+        let isAtBottom = (position == lastItem.id)
+
+        if modelData.isAtBottom != isAtBottom {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                modelData.isAtBottom = isAtBottom
             }
         }
     }

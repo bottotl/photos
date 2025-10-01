@@ -5,12 +5,12 @@
 
 import SwiftUI
 
-/// 照片主视图 - 使用 TabView 切换图库和精选集
+/// 照片主视图 - 固定的导航 TabView
 struct PhotosMainView: View {
     @Environment(ModelData.self) private var modelData
     @State private var selectedTab: PhotosTab = .grid
 
-    /// Tab 选项
+    /// 导航 Tab 选项
     enum PhotosTab {
         case grid      // 图库(照片网格)
         case albums    // 精选集(相册)
@@ -18,14 +18,12 @@ struct PhotosMainView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // 图库标签 - 照片网格视图
             PhotosGridView()
                 .tabItem {
                     Label("图库", systemImage: "photo.on.rectangle")
                 }
                 .tag(PhotosTab.grid)
 
-            // 精选集标签 - 相册视图
             AlbumsGridView()
                 .tabItem {
                     Label("精选集", systemImage: "square.stack")
@@ -37,6 +35,7 @@ struct PhotosMainView: View {
             if selectedTab == .grid {
                 gridToolbarContent
             }
+            searchButton
         }
     }
 
@@ -49,7 +48,18 @@ struct PhotosMainView: View {
         }
     }
 
-    // MARK: - 图库 Toolbar 内容
+    // MARK: - Toolbar 内容
+
+    @ToolbarContentBuilder
+    private var searchButton: some ToolbarContent {
+        ToolbarItem(placement: .automatic) {
+            Button {
+                // 搜索操作
+            } label: {
+                Image(systemName: "magnifyingglass")
+            }
+        }
+    }
 
     @ToolbarContentBuilder
     private var gridToolbarContent: some ToolbarContent {
