@@ -36,6 +36,7 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+      id-token: write  # 需要用于 OIDC token 获取
 
     steps:
       - name: Checkout repository
@@ -45,7 +46,6 @@ jobs:
 
       - name: Run Claude Code
         uses: anthropics/claude-code-action@beta
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
