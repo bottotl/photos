@@ -40,6 +40,7 @@ struct PhotosSplitView: View {
                 PhotoDetailView(mediaItem: item)
             }
         }
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .searchable(text: $modelData.searchString, prompt: "搜索照片")
     }
 }

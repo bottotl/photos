@@ -32,6 +32,95 @@ struct PhotosMainView: View {
                 }
                 .tag(PhotosTab.albums)
         }
+        .navigationTitle(navigationTitle)
+        .navigationSubtitle(navigationSubtitle)
+        .toolbar {
+            if selectedTab == .grid {
+                gridToolbarContent
+            }
+        }
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .overlay(alignment: .top) {
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.6),
+                    Color.black.opacity(0.3),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 200)
+            .ignoresSafeArea(edges: .top)
+            .allowsHitTesting(false)
+        }
+    }
+
+    // MARK: - 导航标题
+
+    private var navigationTitle: String {
+        switch selectedTab {
+        case .grid: "图库"
+        case .albums: "精选集"
+        }
+    }
+
+    private var navigationSubtitle: String {
+        switch selectedTab {
+        case .grid:
+            return modelData.titleSubtitle
+        case .albums:
+            return "" // 精选集暂不显示副标题
+        }
+    }
+
+    // MARK: - 图库 Toolbar 内容
+
+    @ToolbarContentBuilder
+    private var gridToolbarContent: some ToolbarContent {
+        // 弹性间距 - 把按钮推到右边
+        ToolbarSpacer(.flexible)
+
+        // 排序菜单按钮
+        ToolbarItem {
+            Menu {
+                ForEach(SortOption.allCases) { option in
+                    Button {
+                        modelData.sortOption = option
+                    } label: {
+                        Label {
+                            Text(option.rawValue)
+                        } icon: {
+                            Image(systemName: option.iconName)
+                        }
+                        if modelData.sortOption == option {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            } label: {
+                Label("排序", systemImage: "line.3.horizontal")
+            }
+            .foregroundStyle(.white)
+            .menuIndicator(.hidden)
+        }
+
+        // 固定间距 - 按钮之间的间隔
+        ToolbarSpacer(.fixed)
+
+        // 选择按钮
+        ToolbarItem {
+            Button(modelData.isSelectMode ? "取消" : "选择") {
+                withAnimation {
+                    modelData.isSelectMode.toggle()
+                    if !modelData.isSelectMode {
+                        modelData.selectedItems.removeAll()
+                    }
+                }
+            }
+            .foregroundStyle(.white)
+        }
     }
 }
 

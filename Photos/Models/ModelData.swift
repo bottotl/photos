@@ -6,6 +6,25 @@ Photos 应用的数据管理类
 import Foundation
 import SwiftUI
 
+/// 排序选项
+enum SortOption: String, CaseIterable, Identifiable {
+    case dateNewest = "最新优先"
+    case dateOldest = "最早优先"
+    case typePhoto = "仅照片"
+    case typeVideo = "仅视频"
+
+    var id: String { rawValue }
+
+    var iconName: String {
+        switch self {
+        case .dateNewest: return "arrow.down"
+        case .dateOldest: return "arrow.up"
+        case .typePhoto: return "photo"
+        case .typeVideo: return "video"
+        }
+    }
+}
+
 /// Photos 应用的数据管理类
 @Observable @MainActor
 class ModelData {
@@ -17,8 +36,52 @@ class ModelData {
 
     var windowSize: CGSize = .zero
 
+    // 排序和选择状态
+    var sortOption: SortOption = .dateNewest
+    var isSelectMode: Bool = false
+    var selectedItems: Set<UUID> = []
+
     init() {
         loadMediaItems()
+    }
+
+    // MARK: - 排序后的媒体项
+
+    var sortedMediaItems: [MediaItem] {
+        switch sortOption {
+        case .dateNewest:
+            return mediaItems.reversed()
+        case .dateOldest:
+            return mediaItems
+        case .typePhoto:
+            return mediaItems.filter { !$0.isVideo }
+        case .typeVideo:
+            return mediaItems.filter { $0.isVideo }
+        }
+    }
+
+    // MARK: - 副标题
+
+    /// 根据当前排序选项生成副标题
+    var titleSubtitle: String {
+        switch sortOption {
+        case .dateNewest, .dateOldest:
+            // 显示当前日期
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy年M月d日"
+            formatter.locale = Locale(identifier: "zh_CN")
+            return formatter.string(from: Date())
+
+        case .typePhoto:
+            // 显示照片数量
+            let count = sortedMediaItems.count
+            return "\(count)个照片"
+
+        case .typeVideo:
+            // 显示视频数量
+            let count = sortedMediaItems.count
+            return "\(count)个视频"
+        }
     }
 
     // MARK: - 加载媒体数据
