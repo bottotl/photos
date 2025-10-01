@@ -39,8 +39,6 @@ struct PhotosMainView: View {
                 gridToolbarContent
             }
         }
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbarBackground(.hidden, for: .navigationBar)
         .overlay(alignment: .top) {
             LinearGradient(
                 colors: [
@@ -102,7 +100,6 @@ struct PhotosMainView: View {
             } label: {
                 Label("排序", systemImage: "line.3.horizontal")
             }
-            .foregroundStyle(.white)
             .menuIndicator(.hidden)
         }
 
@@ -119,7 +116,6 @@ struct PhotosMainView: View {
                     }
                 }
             }
-            .foregroundStyle(.white)
         }
     }
 }
