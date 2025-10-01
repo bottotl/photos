@@ -16,35 +16,60 @@ struct PhotosGridView: View {
                 columns: gridColumns,
                 spacing: Constants.photoGridSpacing
             ) {
-                ForEach(modelData.mediaItems) { item in
-                    NavigationLink(value: item) {
-                        PhotoItemView(mediaItem: item)
-                    }
-                    .buttonStyle(.plain)
+                ForEach(modelData.sortedMediaItems) { item in
+                    photoItemButton(for: item)
                 }
             }
         }
         .defaultScrollAnchor(.bottom)
         .ignoresSafeArea(edges: .top)
-        .navigationTitle("图库")
-        .toolbar {
-            ToolbarItem(placement: .automatic) {
-                Menu {
-                    Button("设置") {
-                        // 设置操作
-                    }
-                    Button("关于") {
-                        // 关于操作
-                    }
-                } label: {
-                    Image(systemName: "line.3.horizontal")
-                }
-            }
+    }
 
-            ToolbarItem(placement: .automatic) {
-                Button("选择") {
-                    // 选择操作
-                }
+    // MARK: - 照片项按钮
+
+    @ViewBuilder
+    private func photoItemButton(for item: MediaItem) -> some View {
+        if modelData.isSelectMode {
+            // 选择模式：点击切换选中状态
+            Button {
+                toggleSelection(for: item)
+            } label: {
+                PhotoItemView(mediaItem: item)
+                    .overlay(alignment: .topTrailing) {
+                        selectionIndicator(for: item)
+                    }
+            }
+            .buttonStyle(.plain)
+        } else {
+            // 普通模式：导航到详情页
+            NavigationLink(value: item) {
+                PhotoItemView(mediaItem: item)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - 选择指示器
+
+    @ViewBuilder
+    private func selectionIndicator(for item: MediaItem) -> some View {
+        let isSelected = modelData.selectedItems.contains(item.id)
+
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+            .font(.system(size: 24))
+            .foregroundStyle(isSelected ? .blue : .white)
+            .shadow(color: .black.opacity(0.3), radius: 2)
+            .padding(8)
+    }
+
+    // MARK: - 辅助方法
+
+    private func toggleSelection(for item: MediaItem) {
+        withAnimation {
+            if modelData.selectedItems.contains(item.id) {
+                modelData.selectedItems.remove(item.id)
+            } else {
+                modelData.selectedItems.insert(item.id)
             }
         }
     }
@@ -56,8 +81,9 @@ struct PhotosGridView: View {
         if horizontalSizeClass == .regular {
             count = 6 // iPad
         } else {
-            let width = UIScreen.main.bounds.width
-            count = width > 600 ? 4 : 3 // iPhone
+            // iPhone - 使用窗口尺寸而非 UIScreen.main（iOS 26 推荐）
+            let width = modelData.windowSize.width
+            count = width > 600 ? 4 : 3
         }
         return Array(repeating: GridItem(.flexible(), spacing: Constants.photoGridSpacing), count: count)
     }

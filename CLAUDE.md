@@ -65,7 +65,7 @@ This project follows Apple's Landmarks sample app architecture pattern:
 - Grid columns: iPad (6), iPhone large (4), iPhone (3)
 - `LazyVGrid` with `GridItem(.flexible())` for performance
 
-### iOS 18 Liquid Glass Design
+### iOS 26 Liquid Glass Design
 - Uses `.toolbar` API for NavigationBar buttons (system auto-applies glass effect)
 - TabView automatically applies `.ultraThinMaterial` glass effect
 - Photo detail page uses `.toolbarBackground(.hidden)` for transparent toolbar
