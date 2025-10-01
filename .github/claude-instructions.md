@@ -23,11 +23,12 @@
    - 文件头注释说明用途和架构参考
    - 遵循 Swift 命名规范(camelCase)
 
-4. **iOS 18 特性**:
-   - 使用 `.toolbar` API 而非自定义导航栏
-   - 使用系统 TabView 而非自定义实现
-   - 利用 `.onGeometryChange` 而非旧 API
-   - 应用 Liquid Glass 设计规范
+4. **iOS 26 Liquid Glass 特性**:
+   - 使用 Liquid Glass 动态材质系统
+   - 应用 Lensing 效果(动态弯曲和聚焦光线)
+   - 使用 `.toolbar` API 自动应用玻璃效果
+   - 利用 `.onGeometryChange` 响应几何变化
+   - 系统 TabView 自动应用 Liquid Glass 材质
 
 ### 审查清单
 
@@ -37,13 +38,15 @@
 - [ ] 是否破坏 NavigationSplitView 层级
 - [ ] 是否有硬编码的尺寸(应使用 Constants)
 - [ ] 是否缺少中文注释
+- [ ] 是否正确应用 Liquid Glass 材质
 - [ ] 是否使用过时的 SwiftUI API
 
 **建议提供**:
-- Swift 代码风格改进
+- Swift 6.0 代码风格改进
 - 响应式布局优化建议
 - 性能优化建议(LazyVGrid, 图片加载等)
-- Liquid Glass 设计改进
+- Liquid Glass 材质和 Lensing 效果优化
+- iOS 26 新特性应用建议
 
 ### 回答风格
 

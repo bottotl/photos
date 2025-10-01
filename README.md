@@ -1,6 +1,6 @@
 # Photos - SwiftUI 照片应用
 
-基于 SwiftUI 的现代照片应用，采用 iOS 18 Liquid Glass 设计规范和 Apple Landmarks 架构模式。
+基于 SwiftUI 的现代照片应用，采用 iOS 26 Liquid Glass 设计系统和 Apple Landmarks 架构模式。
 
 ## 📱 功能特性
 
@@ -68,7 +68,7 @@ Photos/
 
 ## 🎨 Liquid Glass 设计系统
 
-参考 iOS 18 的 Liquid Glass 设计规范：
+采用 iOS 26 的 Liquid Glass 设计系统：
 
 ### 视觉特性
 - **毛玻璃材质**: 使用 `.ultraThinMaterial` 创造通透效果
@@ -79,8 +79,8 @@ Photos/
 
 #### NavigationBar
 - 使用 `.toolbar` API 添加工具栏按钮
-- 系统自动应用 iOS 18 玻璃效果
-- 按钮自动获得 `.ultraThinMaterial` 背景
+- 系统自动应用 Liquid Glass 材质效果
+- 按钮自动获得动态玻璃背景
 
 #### 照片详情页
 - 透明导航栏：`.toolbarBackground(.hidden)`
@@ -153,21 +153,23 @@ enum NavigationOptions: Equatable, Hashable, Identifiable {
 3. 运行项目 (⌘R)
 
 ### 构建要求
-- **Xcode**: 16.0+
-- **iOS**: 18.0+
-- **Swift**: 5.10+
+- **Xcode**: 17.0+
+- **iOS**: 26.0+
+- **Swift**: 6.0+
 
 ## 📖 参考资源
 
 ### Apple 官方文档
 - [Landmarks Sample App](https://developer.apple.com/tutorials/swiftui/building-lists-and-navigation)
 - [Liquid Glass Design](https://developer.apple.com/documentation/TechnologyOverviews/adopting-liquid-glass)
+- [Liquid Glass Overview](https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass)
 - [Observable Macro](https://developer.apple.com/documentation/Observation)
 - [NavigationSplitView](https://developer.apple.com/documentation/swiftui/navigationsplitview)
 
 ### WWDC Sessions
+- WWDC 2025: Meet Liquid Glass
+- WWDC 2025: Adopt the Liquid Glass design system
 - WWDC 2024: What's new in SwiftUI
-- WWDC 2024: Adopt the Liquid Glass design system
 
 ## 🎯 下一步开发
 
