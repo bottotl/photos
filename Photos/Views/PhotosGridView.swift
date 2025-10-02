@@ -9,7 +9,6 @@ import SwiftUI
 struct PhotosGridView: View {
     @Environment(ModelData.self) private var modelData
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @State private var scrollPosition: UUID?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -23,11 +22,24 @@ struct PhotosGridView: View {
                     }
                 }
             }
-            .scrollPosition(id: $scrollPosition)
             .defaultScrollAnchor(.bottom)
             .ignoresSafeArea(edges: .top)
-            .onChange(of: scrollPosition) { _, newValue in
-                checkScrollPosition(newValue)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                let contentHeight = geometry.contentSize.height
+                let visibleHeight = geometry.containerSize.height
+                let offsetY = geometry.contentOffset.y
+
+                // 计算距离底部的距离
+                let distance = contentHeight - (offsetY + visibleHeight)
+
+                // 距离底部 < 50 认为在底部
+                return distance < 50
+            } action: { _, isAtBottom in
+                if modelData.isAtBottom != isAtBottom {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        modelData.isAtBottom = isAtBottom
+                    }
+                }
             }
 
             // 时间筛选器 - 不在底部时显示
@@ -83,23 +95,6 @@ struct PhotosGridView: View {
                 modelData.selectedItems.remove(item.id)
             } else {
                 modelData.selectedItems.insert(item.id)
-            }
-        }
-    }
-
-    // 检测滚动位置
-    private func checkScrollPosition(_ position: UUID?) {
-        guard let position = position,
-              let lastItem = modelData.sortedMediaItems.last else {
-            return
-        }
-
-        // 检查是否在底部（最后一项可见）
-        let isAtBottom = (position == lastItem.id)
-
-        if modelData.isAtBottom != isAtBottom {
-            withAnimation(.easeInOut(duration: 0.25)) {
-                modelData.isAtBottom = isAtBottom
             }
         }
     }
