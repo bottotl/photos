@@ -9,9 +9,10 @@ import SwiftUI
 struct PhotosGridView: View {
     @Environment(ModelData.self) private var modelData
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    let onScrollToBottomAction: (@escaping () -> Void) -> Void
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 LazyVGrid(
                     columns: gridColumns,
@@ -19,6 +20,7 @@ struct PhotosGridView: View {
                 ) {
                     ForEach(modelData.sortedMediaItems) { item in
                         photoItemButton(for: item)
+                            .id(item.id)
                     }
                 }
             }
@@ -41,11 +43,14 @@ struct PhotosGridView: View {
                     }
                 }
             }
-
-            // 时间筛选器 - 不在底部时显示
-            if !modelData.isAtBottom {
-                TimelineFilterView()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            .onAppear {
+                // 提供滚动到底部的回调
+                onScrollToBottomAction {
+                    guard let lastItem = modelData.sortedMediaItems.last else { return }
+                    withAnimation(.spring(response: 0.4)) {
+                        proxy.scrollTo(lastItem.id, anchor: .bottom)
+                    }
+                }
             }
         }
     }
@@ -198,7 +203,7 @@ struct PhotoDetailView: View {
 #Preview {
     @Previewable @State var modelData = ModelData()
 
-    PhotosGridView()
+    PhotosGridView(onScrollToBottomAction: { _ in })
         .environment(modelData)
         .onGeometryChange(for: CGSize.self) { geometry in
             geometry.size
