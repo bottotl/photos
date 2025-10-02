@@ -9,26 +9,27 @@ import SwiftUI
 struct PhotosMainView: View {
     @Environment(ModelData.self) private var modelData
     @State private var selectedTab: PhotosTab = .grid
+    @State private var scrollToBottomAction: (() -> Void)?
 
     /// 导航 Tab 选项
-    enum PhotosTab {
+    enum PhotosTab: Hashable {
         case grid      // 图库(照片网格)
         case albums    // 精选集(相册)
     }
 
     var body: some View {
+        @Bindable var modelData = modelData
+
         TabView(selection: $selectedTab) {
-            PhotosGridView()
-                .tabItem {
-                    Label("图库", systemImage: "photo.on.rectangle")
-                }
-                .tag(PhotosTab.grid)
+            PhotosGridView(onScrollToBottomAction: { action in
+                scrollToBottomAction = action
+            })
+            .tag(PhotosTab.grid)
+            .toolbar(.hidden, for: .tabBar)
 
             AlbumsGridView()
-                .tabItem {
-                    Label("精选集", systemImage: "square.stack")
-                }
                 .tag(PhotosTab.albums)
+                .toolbar(.hidden, for: .tabBar)
         }
         .navigationTitle(navigationTitle)
         .navigationSubtitle(navigationSubtitle)
@@ -36,7 +37,8 @@ struct PhotosMainView: View {
             if selectedTab == .grid {
                 gridToolbarContent
             }
-            searchButton
+
+            bottomToolbarContent
         }
         .overlay(alignment: .top) {
             LinearGradient(
@@ -73,17 +75,6 @@ struct PhotosMainView: View {
     }
 
     // MARK: - Toolbar 内容
-
-    @ToolbarContentBuilder
-    private var searchButton: some ToolbarContent {
-        ToolbarItem(placement: .automatic) {
-            Button {
-                // 搜索操作
-            } label: {
-                Image(systemName: "magnifyingglass")
-            }
-        }
-    }
 
     @ToolbarContentBuilder
     private var gridToolbarContent: some ToolbarContent {
@@ -127,6 +118,69 @@ struct PhotosMainView: View {
                 }
             }
         }
+    }
+
+    @ToolbarContentBuilder
+    private var bottomToolbarContent: some ToolbarContent {
+        // 左侧：返回按钮（仅在年月日模式显示）
+        if shouldShowTimelineFilter {
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    withAnimation(.spring(response: 0.3)) {
+                        scrollToBottomAction?()
+                    }
+                } label: {
+                    Image(systemName: "photo.on.rectangle")
+                }
+                .accessibilityLabel("返回图库底部")
+            }
+
+            ToolbarSpacer(.fixed)
+        }
+
+        // 中间：Segmented Control
+        ToolbarItem(placement: .bottomBar) {
+            if shouldShowTimelineFilter {
+                // 年月日筛选器
+                Picker("时间筛选", selection: Binding(
+                    get: { modelData.timelineFilter },
+                    set: { modelData.timelineFilter = $0 }
+                )) {
+                    Text("年").tag(TimelineFilter.year)
+                    Text("月").tag(TimelineFilter.month)
+                    Text("全部").tag(TimelineFilter.all)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+            } else {
+                // Tab 切换器
+                Picker("切换视图", selection: $selectedTab) {
+                    Text("图库").tag(PhotosTab.grid)
+                    Text("精选集").tag(PhotosTab.albums)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+            }
+        }
+
+        ToolbarSpacer(.flexible)
+
+        // 右侧：搜索按钮
+        ToolbarItem(placement: .bottomBar) {
+            Button {
+                // 搜索操作
+            } label: {
+                Image(systemName: "magnifyingglass")
+            }
+            .accessibilityLabel("搜索")
+        }
+    }
+
+    // MARK: - 辅助属性
+
+    /// 是否显示时间筛选器（而非 Tab 切换器）
+    private var shouldShowTimelineFilter: Bool {
+        selectedTab == .grid && !modelData.isAtBottom
     }
 }
 

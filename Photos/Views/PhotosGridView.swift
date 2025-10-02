@@ -9,9 +9,10 @@ import SwiftUI
 struct PhotosGridView: View {
     @Environment(ModelData.self) private var modelData
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    let onScrollToBottomAction: (@escaping () -> Void) -> Void
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 LazyVGrid(
                     columns: gridColumns,
@@ -19,6 +20,35 @@ struct PhotosGridView: View {
                 ) {
                     ForEach(modelData.sortedMediaItems) { item in
                         photoItemButton(for: item)
+                            .id(item.id)
+                    }
+                }
+            }
+            .defaultScrollAnchor(.bottom)
+            .ignoresSafeArea(edges: .top)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                let contentHeight = geometry.contentSize.height
+                let visibleHeight = geometry.containerSize.height
+                let offsetY = geometry.contentOffset.y
+
+                // 计算距离底部的距离
+                let distance = contentHeight - (offsetY + visibleHeight)
+
+                // 距离底部 < 50 认为在底部
+                return distance < 50
+            } action: { _, isAtBottom in
+                if modelData.isAtBottom != isAtBottom {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        modelData.isAtBottom = isAtBottom
+                    }
+                }
+            }
+            .onAppear {
+                // 提供滚动到底部的回调
+                onScrollToBottomAction {
+                    guard let lastItem = modelData.sortedMediaItems.last else { return }
+                    withAnimation(.spring(response: 0.4)) {
+                        proxy.scrollTo(lastItem.id, anchor: .bottom)
                     }
                 }
             }
@@ -198,7 +228,7 @@ struct PhotoDetailView: View {
 #Preview {
     @Previewable @State var modelData = ModelData()
 
-    PhotosGridView()
+    PhotosGridView(onScrollToBottomAction: { _ in })
         .environment(modelData)
         .onGeometryChange(for: CGSize.self) { geometry in
             geometry.size

@@ -16,7 +16,7 @@ enum NavigationOptions: Equatable, Hashable, Identifiable {
     /// 全部视图
     case all
 
-    static let mainPages: [NavigationOptions] = [.photos, .years, .months, .all]
+    static let mainPages: [NavigationOptions] = [.photos]
 
     var id: String {
         switch self {
