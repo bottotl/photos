@@ -11,18 +11,43 @@ struct PhotosGridView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVGrid(
-                columns: gridColumns,
-                spacing: Constants.photoGridSpacing
-            ) {
-                ForEach(modelData.sortedMediaItems) { item in
-                    photoItemButton(for: item)
+        ZStack(alignment: .bottom) {
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(
+                    columns: gridColumns,
+                    spacing: Constants.photoGridSpacing
+                ) {
+                    ForEach(modelData.sortedMediaItems) { item in
+                        photoItemButton(for: item)
+                    }
                 }
             }
+            .defaultScrollAnchor(.bottom)
+            .ignoresSafeArea(edges: .top)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                let contentHeight = geometry.contentSize.height
+                let visibleHeight = geometry.containerSize.height
+                let offsetY = geometry.contentOffset.y
+
+                // 计算距离底部的距离
+                let distance = contentHeight - (offsetY + visibleHeight)
+
+                // 距离底部 < 50 认为在底部
+                return distance < 50
+            } action: { _, isAtBottom in
+                if modelData.isAtBottom != isAtBottom {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        modelData.isAtBottom = isAtBottom
+                    }
+                }
+            }
+
+            // 时间筛选器 - 不在底部时显示
+            if !modelData.isAtBottom {
+                TimelineFilterView()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
-        .defaultScrollAnchor(.bottom)
-        .ignoresSafeArea(edges: .top)
     }
 
     // MARK: - 照片项按钮

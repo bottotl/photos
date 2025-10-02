@@ -25,6 +25,23 @@ enum SortOption: String, CaseIterable, Identifiable {
     }
 }
 
+/// 时间线筛选选项
+enum TimelineFilter: String, CaseIterable, Identifiable {
+    case year = "年"
+    case month = "月"
+    case all = "全部"
+
+    var id: String { rawValue }
+
+    var iconName: String {
+        switch self {
+        case .year: return "calendar"
+        case .month: return "calendar.badge.clock"
+        case .all: return "square.grid.2x2"
+        }
+    }
+}
+
 /// Photos 应用的数据管理类
 @Observable @MainActor
 class ModelData {
@@ -40,6 +57,10 @@ class ModelData {
     var sortOption: SortOption = .dateNewest
     var isSelectMode: Bool = false
     var selectedItems: Set<UUID> = []
+
+    // 滚动和筛选状态
+    var isAtBottom: Bool = true  // 是否滚动到底部
+    var timelineFilter: TimelineFilter = .all  // 时间线筛选选项
 
     init() {
         loadMediaItems()
