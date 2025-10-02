@@ -81,6 +81,30 @@ class ModelData {
         }
     }
 
+    // MARK: - 副标题
+
+    /// 根据当前排序选项生成副标题
+    var titleSubtitle: String {
+        switch sortOption {
+        case .dateNewest, .dateOldest:
+            // 显示当前日期
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy年M月d日"
+            formatter.locale = Locale(identifier: "zh_CN")
+            return formatter.string(from: Date())
+
+        case .typePhoto:
+            // 显示照片数量
+            let count = sortedMediaItems.count
+            return "\(count)个照片"
+
+        case .typeVideo:
+            // 显示视频数量
+            let count = sortedMediaItems.count
+            return "\(count)个视频"
+        }
+    }
+
     // MARK: - 加载媒体数据
 
     func loadMediaItems() {

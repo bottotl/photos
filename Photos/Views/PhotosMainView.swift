@@ -31,11 +31,26 @@ struct PhotosMainView: View {
                 .tag(PhotosTab.albums)
         }
         .navigationTitle(navigationTitle)
+        .navigationSubtitle(navigationSubtitle)
         .toolbar {
             if selectedTab == .grid {
                 gridToolbarContent
             }
             searchButton
+        }
+        .overlay(alignment: .top) {
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.6),
+                    Color.black.opacity(0.3),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 200)
+            .ignoresSafeArea(edges: .top)
+            .allowsHitTesting(false)
         }
     }
 
@@ -45,6 +60,15 @@ struct PhotosMainView: View {
         switch selectedTab {
         case .grid: "图库"
         case .albums: "精选集"
+        }
+    }
+
+    private var navigationSubtitle: String {
+        switch selectedTab {
+        case .grid:
+            return modelData.titleSubtitle
+        case .albums:
+            return "" // 精选集暂不显示副标题
         }
     }
 
