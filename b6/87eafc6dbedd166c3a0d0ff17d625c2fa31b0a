@@ -1,0 +1,28 @@
+Photos/Views/PhotosGridView.swift
+  s_fc1f8db43295bd::t_3838567cfe702d 29,37-48
+Photos/Views/PhotosMainView.swift
+  s_fc1f8db43295bd::t_adae85fb28635b 55-69,138-140
+Photos/Views/PhotosBottomBar.swift
+  s_fc1f8db43295bd::t_91698fe99c048c 34,100
+  s_fc1f8db43295bd::t_adae85fb28635b 1-18,23-33,35-52,55,57-79,81-93,95-96,98-99,101-120,122-151,153-195
+  s_fc1f8db43295bd::t_9fe80e0fde6ce2 20,53,152
+  s_fc1f8db43295bd::t_10cd5085a7d9b1 80
+  s_fc1f8db43295bd::t_af258fb0a83c26 19,21-22,94,97,121
+  s_fc1f8db43295bd::t_a0370c78a1922f 54,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b687eafc6dbedd166c3a0d0ff17d625c2fa31b0a",
+  "prompts": {},
+  "sessions": {
+    "s_fc1f8db43295bd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ea697-055a-72c1-94e7-eb27cb34f275",
+        "model": "gpt-5.5"
+      },
+      "human_author": "於林涛 <yulintao3@jd.com>"
+    }
+  }
+}
