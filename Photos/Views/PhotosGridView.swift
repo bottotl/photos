@@ -26,7 +26,7 @@ struct PhotosGridView: View {
             }
             .defaultScrollAnchor(.bottom)
             .ignoresSafeArea(edges: .top)
-            .onScrollGeometryChange(for: Bool.self) { geometry in
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 let contentHeight = geometry.contentSize.height
                 let visibleHeight = geometry.containerSize.height
                 let offsetY = geometry.contentOffset.y
@@ -34,13 +34,18 @@ struct PhotosGridView: View {
                 // 计算距离底部的距离
                 let distance = contentHeight - (offsetY + visibleHeight)
 
-                // 距离底部 < 50 认为在底部
-                return distance < 50
-            } action: { _, isAtBottom in
-                if modelData.isAtBottom != isAtBottom {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        modelData.isAtBottom = isAtBottom
-                    }
+                return max(distance, 0)
+            } action: { _, distanceToBottom in
+                let shouldBeAtBottom = if modelData.isAtBottom {
+                    // 从底部向上滑动超过一段距离后，再切到年/月/全部。
+                    distanceToBottom < 120
+                } else {
+                    // 已经进入时间线模式后，只有真正回到底部附近才切回图库/精选集。
+                    distanceToBottom < 20
+                }
+
+                if modelData.isAtBottom != shouldBeAtBottom {
+                    modelData.isAtBottom = shouldBeAtBottom
                 }
             }
             .onAppear {
@@ -51,31 +56,6 @@ struct PhotosGridView: View {
                         proxy.scrollTo(lastItem.id, anchor: .bottom)
                     }
                 }
-            }
-            .defaultScrollAnchor(.bottom)
-            .ignoresSafeArea(edges: .top)
-            .onScrollGeometryChange(for: Bool.self) { geometry in
-                let contentHeight = geometry.contentSize.height
-                let visibleHeight = geometry.containerSize.height
-                let offsetY = geometry.contentOffset.y
-
-                // 计算距离底部的距离
-                let distance = contentHeight - (offsetY + visibleHeight)
-
-                // 距离底部 < 50 认为在底部
-                return distance < 50
-            } action: { _, isAtBottom in
-                if modelData.isAtBottom != isAtBottom {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        modelData.isAtBottom = isAtBottom
-                    }
-                }
-            }
-
-            // 时间筛选器 - 不在底部时显示
-            if !modelData.isAtBottom {
-                TimelineFilterView()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
     }

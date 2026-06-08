@@ -37,8 +37,6 @@ struct PhotosMainView: View {
             if selectedTab == .grid {
                 gridToolbarContent
             }
-
-            bottomToolbarContent
         }
         .overlay(alignment: .top) {
             LinearGradient(
@@ -53,6 +51,21 @@ struct PhotosMainView: View {
             .frame(height: 200)
             .ignoresSafeArea(edges: .top)
             .allowsHitTesting(false)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            PhotosBottomBar(
+                mode: bottomBarMode,
+                selectedTab: $selectedTab,
+                timelineFilter: $modelData.timelineFilter,
+                scrollToBottom: {
+                    withAnimation(.spring(response: 0.3)) {
+                        scrollToBottomAction?()
+                    }
+                },
+                search: {
+                    // 搜索操作
+                }
+            )
         }
     }
 
@@ -120,67 +133,11 @@ struct PhotosMainView: View {
         }
     }
 
-    @ToolbarContentBuilder
-    private var bottomToolbarContent: some ToolbarContent {
-        // 左侧：返回按钮（仅在年月日模式显示）
-        if shouldShowTimelineFilter {
-            ToolbarItem(placement: .bottomBar) {
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        scrollToBottomAction?()
-                    }
-                } label: {
-                    Image(systemName: "photo.on.rectangle")
-                }
-                .accessibilityLabel("返回图库底部")
-            }
-
-            ToolbarSpacer(.fixed)
-        }
-
-        // 中间：Segmented Control
-        ToolbarItem(placement: .bottomBar) {
-            if shouldShowTimelineFilter {
-                // 年月日筛选器
-                Picker("时间筛选", selection: Binding(
-                    get: { modelData.timelineFilter },
-                    set: { modelData.timelineFilter = $0 }
-                )) {
-                    Text("年").tag(TimelineFilter.year)
-                    Text("月").tag(TimelineFilter.month)
-                    Text("全部").tag(TimelineFilter.all)
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-            } else {
-                // Tab 切换器
-                Picker("切换视图", selection: $selectedTab) {
-                    Text("图库").tag(PhotosTab.grid)
-                    Text("精选集").tag(PhotosTab.albums)
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-            }
-        }
-
-        ToolbarSpacer(.flexible)
-
-        // 右侧：搜索按钮
-        ToolbarItem(placement: .bottomBar) {
-            Button {
-                // 搜索操作
-            } label: {
-                Image(systemName: "magnifyingglass")
-            }
-            .accessibilityLabel("搜索")
-        }
-    }
-
     // MARK: - 辅助属性
 
-    /// 是否显示时间筛选器（而非 Tab 切换器）
-    private var shouldShowTimelineFilter: Bool {
-        selectedTab == .grid && !modelData.isAtBottom
+    /// 底部栏形态：图库底部是图库/精选集，向上滚动后切到年/月/全部。
+    private var bottomBarMode: PhotosBottomBarMode {
+        selectedTab == .grid && !modelData.isAtBottom ? .timeline : .library
     }
 }
 
